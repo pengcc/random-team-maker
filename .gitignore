@@ -1,0 +1,10 @@
+dist/
+node_modules
+.pnpm-debug.log
+.vscode
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
