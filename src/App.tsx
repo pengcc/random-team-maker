@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {useFormInput} from './utils/myHooks'
 import PlayersList from './components/PlayersList'
+import { PlayerItem } from './interfaces/IPlayers'
 import {
   createSingleMatch,
   createMultipleMatches,
@@ -13,7 +14,7 @@ function App() {
   const playersListStr = useFormInput('');
   const [singleMatch, setSingleMatch] = useState([])
   const [multipleMatches, setMultipleMatches] = useState([])
-  const [playersListArr, setPlayersListArr] = useState([]);
+  const [playersListArr, setPlayersListArr] = useState<Array<PlayerItem>>([]);
 
   function handleCreatingPlayersList() {
     const playersStr = playersListStr.value;
@@ -23,6 +24,14 @@ function App() {
       console.log(playersArr)
       setPlayersListArr(playersArr);
     }
+  }
+
+  function handleShowingSingleMatch() {
+
+  }
+
+  function handleShowingMultipleMatches() {
+    
   }
   return (
     <div className="App">
@@ -38,8 +47,8 @@ function App() {
           {playersListArr && <PlayersList dataList={playersListArr} />}
           
           <div>
-            <button id="showSingleMatch" onClick={createSingleMatch} className="action-btn">Single match</button>
-            <button id="showMultipleMatches" onClick={createMultipleMatches} className="action-btn">Multiple matches</button>
+            <button id="showSingleMatch" onClick={handleShowingSingleMatch} className="action-btn">Single match</button>
+            <button id="showMultipleMatches" onClick={handleShowingMultipleMatches} className="action-btn">Multiple matches</button>
           </div>
           <div>
             过滤配对说明，在两个名字后边添加‘#1’， 这两名队员不会出现在组合中。如果希望多人不出现在组合中，多人名字后加比如‘#1’。

@@ -1,8 +1,9 @@
-dist/
-node_modules
 .pnpm-debug.log
 .vscode
-
+node_modules
+dist
+dist-ssr
+*.local
 # OS generated files #
 ######################
 .DS_Store
