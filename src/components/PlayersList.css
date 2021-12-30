@@ -1,0 +1,12 @@
+.PlayersList {
+    text-align: left;
+}
+
+.player > span {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.player-name {
+    width: 120px;
+}

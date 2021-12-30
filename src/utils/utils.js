@@ -79,9 +79,9 @@ function createTeamListArr({playerListArr, archivedTeamListArr=[]} = {}) {
 
 function teamListArrToHtmlText({teamListArr} = {}) {
   return teamListArr.map((team, index) => team.length > 1 ?
-                      `${index + 1}. ${team.join(' + ')} \n` :
-                       `${index + 1}. ${team.pop()} \n`
-  );
+                        `${index + 1}. ${team.join(' + ')} \n` :
+                         `${index + 1}. ${team.pop()} \n`
+                        );
 }
 
 function appendTextToTextArea({elemId, text}) {
