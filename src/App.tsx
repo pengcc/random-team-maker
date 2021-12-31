@@ -31,7 +31,7 @@ function App() {
 
   function handleShowingSimpleSingleMatch() {
     const simpleMatch = createSimpleMatch({playersListArr})
-    const matchResultText = teamListArrToHtmlText({teamListArr: simpleMatch})
+    const matchResultText = teamListArrToHtmlText({teamList: simpleMatch})
     setSimpleSingleMatchText(matchResultText);
   }
 
@@ -57,7 +57,7 @@ function App() {
           </div>
 
           <div>
-            {simpleSingleMatchText}
+            <textarea value={simpleSingleMatchText}></textarea>
           </div>
       </main>
     </div>

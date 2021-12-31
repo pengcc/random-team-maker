@@ -1,5 +1,6 @@
 .pnpm-debug.log
 .vscode
+coverage
 node_modules
 dist
 dist-ssr

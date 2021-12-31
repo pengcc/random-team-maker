@@ -3,5 +3,5 @@ export interface PlayerItem {
 }
 
 export interface PlayersListProps {
-    dataList: Array<PlayerItem>,
+    dataList: Array<PlayerItem | string>,
 }

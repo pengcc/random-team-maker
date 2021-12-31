@@ -2,7 +2,7 @@ import {it, describe, expect, assert} from 'vitest'
 import {getRandomTeam, createSimpleMatch} from '../../src/utils/playersGroupingHelpers'
 
 describe('players grouping helpers', () => {
-    describe('players grouping helpers -- getRandomTeam', () => {
+    describe('getRandomTeam', () => {
         it('return the array if the length less than 2', () => {
             const players = [{name: 'foo'}];
             const team = getRandomTeam({playersListArr: players});
@@ -12,13 +12,13 @@ describe('players grouping helpers', () => {
         it('players list array contains team member', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}]
             const team = getRandomTeam({playersListArr: players})
-            expect(players).toEqual(expect.arrayContaining(team))
+            expect(players.map(({name}) => name)).toEqual(expect.arrayContaining(team))
         })
     
         it('team mates should be different players', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}, {name: 'yo yo'}]
             const team = getRandomTeam({playersListArr: players})
-            expect(team[0].name).not.toEqual(team[1].name)
+            expect(team[0]).not.toEqual(team[1])
         })
     })
     
@@ -34,7 +34,17 @@ describe('players grouping helpers', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}, {name: 'yo yo'}]
             const teamList = createSimpleMatch({playersListArr: players})
             console.log(JSON.stringify(teamList))
-            expect(teamList.length * 2).toBe(players.length)
+            expect(teamList.flat()).toEqual(expect.arrayContaining(players.map(({name}) => name)))
+        })
+
+        it('given teammate map, teammates should not rematch together', () => {
+            const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}, {name: 'yo yo'}, {name: 'hi hi'}, {name: 'la la'}]
+            const teammateMap = {foo: ['bar', 'zzz', 'la la']}
+            const teamList = createSimpleMatch({playersListArr: players, teammateMap})
+            const teamFoo = teamList.find( team => team.includes('foo'))
+            const teamFooMate = teamFoo.filter(name => name !== 'foo')
+            console.log(JSON.stringify(teamList))
+            expect(['bar', 'zzz'].includes(teamFooMate)).toBe(false)
         })
     })
 })
