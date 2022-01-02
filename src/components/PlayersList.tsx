@@ -1,9 +1,9 @@
-import {PlayersListProps} from '../interfaces/IPlayers'
+import {IPlayersListProps} from '../interfaces/IPlayers'
 import { useFormInput } from '../utils/myHooks'
 import './PlayersList.css'
 
 const options = {gender: ['male', 'female']}
-function PlayersList({dataList}: PlayersListProps) {
+function PlayersList({dataList}: IPlayersListProps) {
     const scoreInput = useFormInput('')
     return (
         <div className="PlayersList">

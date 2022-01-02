@@ -1,39 +1,14 @@
-import {PlayerItem} from '../interfaces/IPlayers'
+import { 
+    Team, 
+    IPlayerItem, 
+    IPlayersListStr,
+    ICreateSingleMatchInput,
+    ICreateMultipleMatchesInput,
+    IGetRandomTeamInput,
+    IArrayToHtmlInput,
+    ITeammateMapInput,
+} from '../interfaces/IPlayers'
 import { isNonemptyObj } from './objectHelpers'
-
-type Teammate = Array<string>
-
-interface PlayersListStr {
-    playersListStr: string,
-}
-
-interface CreateSingleMatchInput {
-    playersListArr: Array<PlayerItem>,
-    teammateMap?: Record<string, any>,
-}
-
-interface CreateMultipleMatchesInput {
-    playersListArr: Array<PlayerItem>,
-    round: number,
-    teammateMap?: Record<string, any>,
-    options?: Record<string, any>,
-}
-
-interface GetRandomTeamInput {
-    playersListArr: Array<PlayerItem>,
-    savedTeamList?: Array<Teammate>,
-    teammateMap?: Record<string, any>,
-}
-
-interface ArrayToHtmlInput {
-    teamList: Array<Teammate>,
-}
-
-interface TeammateMapInput {
-    teammateMap: Record<string, any>,
-    playersListArr: Array<PlayerItem>,
-    teamList: Array<Teammate>,
-}
 
 function getRandomIntInclusive(min: number, max: number) {
     min = Math.ceil(min)
@@ -52,18 +27,18 @@ function getRandomItem(arr: Array<any>) {
     return randomItem
 }
 
-function teamListArrToHtmlText({teamList}: ArrayToHtmlInput): string{
+function teamListArrToHtmlText({teamList}: IArrayToHtmlInput): string{
     return teamList.map((team, index) => team.length > 1 ?
                             `${index + 1}. ${team.join(' + ')} \n` :
                             `${index + 1}. ${team.pop()} \n`
                             ).join('')
 }
 
-function createPlayersListArray({playersListStr}: PlayersListStr) {
+function createPlayersListArray({playersListStr}: IPlayersListStr) {
     return playersListStr.split(/\d+\./).slice(1).map( player => ({name: player.trim()}))
 }
 
-function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}}: GetRandomTeamInput) {
+function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}}: IGetRandomTeamInput) {
     if (playersListArr.length < 2) return playersListArr.map(({name}) => name)
     let team = []
     const randomPlayer = getRandomItem(playersListArr)
@@ -87,35 +62,43 @@ function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}}: GetRa
     return team
 }
 
-function createSimpleMatch({playersListArr, teammateMap={}}: CreateSingleMatchInput) {
+function createSimpleMatch({playersListArr, teammateMap={}}: ICreateSingleMatchInput) {
     let teamList: any = []
     let players = JSON.parse(JSON.stringify(playersListArr))
     while (players.length > 0) {
         const team = getRandomTeam({playersListArr: players, savedTeamList: teamList, teammateMap})
         teamList.push(team)
-        players = players.filter((player: PlayerItem) => !teamList.flat().includes(player.name))
+        players = players.filter((player: IPlayerItem) => !teamList.flat().includes(player.name))
     }
 
     return teamList
 }
 
-function updateTeammateMap({playersListArr, teamList, teammateMap={}}: TeammateMapInput) {
-    playersListArr.forEach(({name: playerName}) => {
-        const team = teamList.find(team => team.includes(playerName))
-        const teammateName = team?.filter(name => name !== playerName)[0]
-        if (!teammateMap[playerName]) {
-            teammateMap[playerName] = [teammateName]
-        } else {
-            teammateMap[playerName].push(teammateName)
+
+function updateTeammateMap({teamList, teammateMap={}}: ITeammateMapInput) {
+    if (teamList.length === 0) return {};
+    teamList.forEach(([name1, name2]) => {
+        if(name2) {
+            if (!teammateMap?.[name1]) {
+                teammateMap[name1] = []
+            }
+            teammateMap[name1].push(name2)
+
+            if (!teammateMap?.[name2]) {
+                teammateMap[name2] = []
+            }
+            teammateMap[name2].push(name1)
         }
     })
+
+    return teammateMap;
 }
-function createSimpleMultipleMatches({playersListArr, round, options}: CreateMultipleMatchesInput) {
+function createSimpleMultipleMatches({playersListArr, round, options}: ICreateMultipleMatchesInput) {
     let matchList: any = []
     let teammateMap = {}
     while (round > 0) {
         const teamList = createSimpleMatch({playersListArr, teammateMap})
-        updateTeammateMap({playersListArr, teamList, teammateMap})
+        teammateMap = updateTeammateMap({teamList, teammateMap})
         matchList.push(teamList)
         round--
     }
@@ -124,17 +107,18 @@ function createSimpleMultipleMatches({playersListArr, round, options}: CreateMul
 }
 
 
-function createAdvancedSingleMatch({playersListArr, teammateMap}: CreateSingleMatchInput) {
+function createAdvancedSingleMatch({playersListArr, teammateMap}: ICreateSingleMatchInput) {
     
 }
 
-function createAdvancedMultipleMatches({playersListArr, round, options}: CreateMultipleMatchesInput) {
+function createAdvancedMultipleMatches({playersListArr, round, options}: ICreateMultipleMatchesInput) {
 
 }
 
 
 export {
     getRandomTeam,
+    updateTeammateMap,
     createSimpleMatch,
     createSimpleMultipleMatches,
     createAdvancedSingleMatch,

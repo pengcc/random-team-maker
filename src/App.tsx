@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {useFormInput} from './utils/myHooks'
 import PlayersList from './components/PlayersList'
-import { PlayerItem } from './interfaces/IPlayers'
+import { IPlayerItem, Team } from './interfaces/IPlayers'
 import {
     createSimpleMatch,
     createSimpleMultipleMatches,
@@ -15,11 +15,13 @@ import logo from './assets/logo.svg'
 import './App.css'
 
 function App() {
-  const playersListStr = useFormInput('');
+  const playersListStr = useFormInput('')
+  const round = useFormInput(0)
   const [simpleSingleMatch, setSimpleSingleMatch] = useState([])
   const [simpleMultipleMatches, setSimpleMultipleMatches] = useState([])
-  const [playersListArr, setPlayersListArr] = useState<Array<PlayerItem>>([]);
-  const [simpleSingleMatchText, setSimpleSingleMatchText] = useState('');
+  const [playersListArr, setPlayersListArr] = useState<Array<IPlayerItem>>([])
+  const [simpleSingleMatchText, setSimpleSingleMatchText] = useState('')
+  const [simpleMultipleMatchText, setSimpleMultipleMatchText] = useState('')
 
   function handleCreatingPlayersList() {
     const playersStr = playersListStr.value;
@@ -36,7 +38,9 @@ function App() {
   }
 
   function handleShowingSimpleMultipleMatches() {
-    
+    const multipleMatches = createSimpleMultipleMatches({playersListArr, round: round.value})
+    const matchResultText = multipleMatches.map((teamList: Array<Team>) => teamListArrToHtmlText({teamList})).join('\n \n')
+    setSimpleMultipleMatchText(matchResultText)
   }
   return (
     <div className="App">
@@ -54,10 +58,15 @@ function App() {
           <div>
             <button id="showSingleMatch" onClick={handleShowingSimpleSingleMatch} className="action-btn">Simple Single match</button>
             <button id="showMultipleMatches" onClick={handleShowingSimpleMultipleMatches} className="action-btn">Simple Multiple matches</button>
+          <label>input round number</label>
+          <input {...round} />
           </div>
 
           <div>
-            <textarea value={simpleSingleMatchText}></textarea>
+            <textarea defaultValue={simpleSingleMatchText}></textarea>
+          </div>
+          <div>
+            <textarea defaultValue={simpleMultipleMatchText}></textarea>
           </div>
       </main>
     </div>
