@@ -4,6 +4,7 @@ export interface IPlayerItem {
 
 export interface IPlayersListProps {
     dataList: Array<IPlayerItem>,
+    matchType: string,
 }
 
 export type Team = Array<string>

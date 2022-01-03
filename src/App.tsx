@@ -17,20 +17,28 @@ import './App.css'
 function App() {
   const playersListStr = useFormInput('')
   const round = useFormInput(0)
+  const [matchType, setMatchType] = useState('simple')
   const [simpleSingleMatch, setSimpleSingleMatch] = useState([])
   const [simpleMultipleMatches, setSimpleMultipleMatches] = useState([])
   const [playersListArr, setPlayersListArr] = useState<Array<IPlayerItem>>([])
   const [simpleSingleMatchText, setSimpleSingleMatchText] = useState('')
   const [simpleMultipleMatchText, setSimpleMultipleMatchText] = useState('')
 
-  function handleCreatingPlayersList() {
+  function handleCreatingSimpleMatch() {
     const playersStr = playersListStr.value;
+    if (matchType !== 'simple') {
+      setMatchType('simple')
+    }
     if (playersStr.length > 0) {
       const playersArr = createPlayersListArray({playersListStr: playersStr});
       setPlayersListArr(playersArr);
     }
   }
 
+  function handleCreatingAdvancedMatch() {
+    setMatchType('advanced')
+  }
+  
   function handleShowingSimpleSingleMatch() {
     const simpleMatch = createSimpleMatch({playersListArr})
     const matchResultText = teamListArrToHtmlText({teamList: simpleMatch})
@@ -52,8 +60,9 @@ function App() {
             <label>Input players list</label>
             <input id="playersListStr" className="playersList-input" {...playersListStr} />
           </div>
-          <button onClick={handleCreatingPlayersList}>Show players List</button>
-          {playersListArr && <PlayersList dataList={playersListArr} />}
+          <button onClick={handleCreatingSimpleMatch}>Create simple match</button>
+          <button onClick={handleCreatingAdvancedMatch}>Create advanced match</button>
+          {playersListArr && <PlayersList dataList={playersListArr} matchType={matchType}/>}
           
           <div>
             <button id="showSingleMatch" onClick={handleShowingSimpleSingleMatch} className="action-btn">Simple Single match</button>

@@ -77,7 +77,8 @@ function createSimpleMatch({playersListArr, teammateMap={}}: ICreateSingleMatchI
 
 function updateTeammateMap({teamList, teammateMap={}}: ITeammateMapInput) {
     if (teamList.length === 0) return {};
-    teamList.forEach(([name1, name2]) => {
+
+    for (const [name1, name2] of teamList) {
         if(name2) {
             if (!teammateMap?.[name1]) {
                 teammateMap[name1] = []
@@ -89,7 +90,7 @@ function updateTeammateMap({teamList, teammateMap={}}: ITeammateMapInput) {
             }
             teammateMap[name2].push(name1)
         }
-    })
+    }
 
     return teammateMap;
 }
