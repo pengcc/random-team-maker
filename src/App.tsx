@@ -62,21 +62,28 @@ function App() {
           </div>
           <button onClick={handleCreatingSimpleMatch}>Create simple match</button>
           <button onClick={handleCreatingAdvancedMatch}>Create advanced match</button>
-          {playersListArr && <PlayersList dataList={playersListArr} matchType={matchType}/>}
+          {playersListArr.length > 0 && <PlayersList dataList={playersListArr} matchType={matchType}/>}
           
-          <div>
-            <button id="showSingleMatch" onClick={handleShowingSimpleSingleMatch} className="action-btn">Simple Single match</button>
-            <button id="showMultipleMatches" onClick={handleShowingSimpleMultipleMatches} className="action-btn">Simple Multiple matches</button>
-          <label>input round number</label>
-          <input {...round} />
-          </div>
-
-          <div>
-            <textarea defaultValue={simpleSingleMatchText}></textarea>
-          </div>
-          <div>
-            <textarea defaultValue={simpleMultipleMatchText}></textarea>
-          </div>
+          {playersListArr.length > 0 && 
+              <div>
+                <button id="showSingleMatch" onClick={handleShowingSimpleSingleMatch} className="action-btn">Simple Single match</button>
+                <button id="showMultipleMatches" onClick={handleShowingSimpleMultipleMatches} className="action-btn">Simple Multiple matches</button>
+                <label>input round number</label>
+                <input {...round} />
+              </div>
+          }
+          {simpleSingleMatchText && 
+            <>
+              <div>
+                <textarea defaultValue={simpleSingleMatchText}></textarea>
+              </div>
+              
+              <div>
+                <textarea defaultValue={simpleMultipleMatchText}></textarea>
+              </div>
+            </>
+          }
+          
       </main>
     </div>
   )

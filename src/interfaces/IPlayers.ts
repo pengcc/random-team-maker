@@ -1,5 +1,7 @@
 export interface IPlayerItem {
+    id: string,
     name: string,
+    gender?: string,
 }
 
 export interface IPlayersListProps {
@@ -38,4 +40,9 @@ export interface IArrayToHtmlInput {
 export interface ITeammateMapInput {
     teamList: Array<Team>,
     teammateMap?: Record<string, any>,
+}
+
+export interface IFilterOptionsProps {
+    playerId: string,
+    onChange: Function,
 }

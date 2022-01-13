@@ -1,14 +1,22 @@
+import { IFilterOptionsProps } from "../interfaces/IPlayers"
 import { useFormInput } from "../utils/myHooks"
 
-function FilterOptions() {
+function FilterOptions({playerId, onChange}: IFilterOptionsProps) {
     const scoreInput = useFormInput('')
+    const genderSelect = useFormInput('')
+    const genderSelectName = `gender-${playerId}`
+    const scoreInputName = `score-${playerId}`
+    
     return (
         <>
             <span className='player-gender'>
-                <span>&#9794;<input name="gender" defaultValue="male" type="radio" /></span> 
-                <span>&#9792;<input name="gender" type="radio" /> </span>
+                <select name={genderSelectName} {...genderSelect}>
+                    <option value="">gender</option>
+                    <option value="m">male</option>
+                    <option value="f">female</option>
+                </select>
             </span>
-            <span className='player-score'>score <input name="score" {...scoreInput}/></span>
+            <span className='player-score'>score <input name={scoreInputName} {...scoreInput}/></span>
         </>
     )
 }

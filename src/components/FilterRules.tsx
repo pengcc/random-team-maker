@@ -13,14 +13,14 @@ function FilterRules() {
                 <input name="gender" defaultValue='only mix' type='radio' />
                 <button>reset</button>
             </div>
-            <div>
+            {/* <div>
                 score filter
                 <label>team score not greater than </label>
                 <input type="text" />
                 <label>team score no less than</label>
                 <input type="text" />
                 <button>reset</button>
-            </div>
+            </div> */}
         </div>
     )
 }

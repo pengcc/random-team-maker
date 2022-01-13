@@ -35,7 +35,7 @@ function teamListArrToHtmlText({teamList}: IArrayToHtmlInput): string{
 }
 
 function createPlayersListArray({playersListStr}: IPlayersListStr) {
-    return playersListStr.split(/\d+\./).slice(1).map( player => ({name: player.trim()}))
+    return playersListStr.split(/\d+\./).slice(1).map( (player, index) => ({id: index.toString(), name: player.trim()}))
 }
 
 function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}}: IGetRandomTeamInput) {
