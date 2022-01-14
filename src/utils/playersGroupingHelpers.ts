@@ -7,6 +7,7 @@ import {
     IGetRandomTeamInput,
     IArrayToHtmlInput,
     ITeammateMapInput,
+    IExcludedNameListInput,
 } from '../interfaces/IPlayers'
 import { isNonemptyObj } from './objectHelpers'
 
@@ -38,22 +39,61 @@ function createPlayersListArray({playersListStr}: IPlayersListStr) {
     return playersListStr.split(/\d+\./).slice(1).map( (player, index) => ({id: index.toString(), name: player.trim()}))
 }
 
-function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}}: IGetRandomTeamInput) {
-    if (playersListArr.length < 2) return playersListArr.map(({name}) => name)
-    let team = []
-    const randomPlayer = getRandomItem(playersListArr)
-    const randomPlayerName = randomPlayer.name
-    team.push(randomPlayerName)
-    let validTeammatesArr = playersListArr.filter(({name}) => name !== randomPlayerName)
+function getExcludedNameList({randomPlayerName, savedTeamList=[], teammateMap={}}: IExcludedNameListInput) {
+    let excludedNameList: Array<string> = [randomPlayerName]
 
     if (isNonemptyObj(teammateMap)) {
-        validTeammatesArr = validTeammatesArr.filter(({name}) => !teammateMap?.[randomPlayerName]?.includes(name))
+        const teammate = teammateMap?.[randomPlayerName]
+        if (teammate) {
+            excludedNameList.push(...teammate)
+        }
     }
 
     if (savedTeamList.length > 0) {
-        validTeammatesArr = validTeammatesArr.filter(({name}) => !savedTeamList.flat().includes(name))
-    } 
-        
+        excludedNameList.push(...savedTeamList.flat())
+    }
+
+    return excludedNameList;
+}
+function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}, filterRules={}}: IGetRandomTeamInput) {
+    if (playersListArr.length < 2) return playersListArr.map(({name}) => name)
+    let team: Array<string> = []
+    const randomPlayer = getRandomItem(playersListArr)
+    const randomPlayerName = randomPlayer.name
+    team.push(randomPlayerName)
+
+    const excludedNameList = getExcludedNameList({randomPlayerName, savedTeamList, teammateMap})
+
+    let validTeammatesArr = playersListArr.filter(({name}) => ![...new Set(excludedNameList)].includes(name))
+
+    if (isNonemptyObj(filterRules)) {
+        //const genderRules = ['no male double', 'no female double', 'no mix', 'only mix']
+        const genderRule = filterRules?.gender
+        if (genderRule) {
+            const playerGender = randomPlayer.gender
+            switch(genderRule) {
+                case 'no male double':
+                    if (playerGender === 'm') {
+                        validTeammatesArr = validTeammatesArr.filter(({gender}) => gender !== playerGender)
+                    }
+                    break
+                case 'no female double':
+                    if (playerGender === 'f') {
+                        validTeammatesArr = validTeammatesArr.filter(({gender}) => gender !== playerGender)
+                    }
+                    break
+                case 'no mix':
+                    validTeammatesArr = validTeammatesArr.filter(({gender}) => gender === playerGender)
+                    break
+                case 'only mix':
+                    validTeammatesArr = validTeammatesArr.filter(({gender}) => gender !== playerGender)
+                    break
+                default:
+                    break
+            }
+        }
+    }
+
     if (validTeammatesArr.length > 0) {
         const randomTeammate = getRandomItem(validTeammatesArr)
         team.push(randomTeammate.name)

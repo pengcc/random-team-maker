@@ -1,5 +1,5 @@
 export interface IPlayerItem {
-    id: string,
+    id?: string,
     name: string,
     gender?: string,
 }
@@ -29,6 +29,13 @@ export interface ICreateMultipleMatchesInput {
 
 export interface IGetRandomTeamInput {
     playersListArr: Array<IPlayerItem>,
+    savedTeamList?: Array<Team>,
+    teammateMap?: Record<string, any>,
+    filterRules?: Record<string, any>,
+}
+
+export interface IExcludedNameListInput {
+    randomPlayerName: string,
     savedTeamList?: Array<Team>,
     teammateMap?: Record<string, any>,
 }
