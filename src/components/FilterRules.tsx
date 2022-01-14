@@ -1,16 +1,17 @@
 function FilterRules() {
+    const genderRules = ['no male double', 'no female double', 'no mix', 'only mix']
     return (
         <div>
             <div>
-                gender filter 
-                <label>no male double</label>
-                <input name="gender" defaultValue='no male double' type='radio' />
-                <label>no female double</label>
-                <input name="gender" defaultValue='no female double' type='radio' />
-                <label>no mix</label>
-                <input name="gender" defaultValue='no mix' type='radio' />
-                <label>only mix</label>
-                <input name="gender" defaultValue='only mix' type='radio' />
+                gender rule 
+                {
+                    genderRules.map(rule => (
+                        <label key={rule}>
+                            rule
+                            <input name="gender-rule" defaultValue={rule} type='radio' />
+                        </label>
+                    ))
+                }
                 <button>reset</button>
             </div>
             {/* <div>
