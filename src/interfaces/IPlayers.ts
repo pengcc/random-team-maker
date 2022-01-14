@@ -9,44 +9,47 @@ export interface IPlayersListProps {
     matchType: string,
 }
 
-export type Team = Array<string>
+export type TeammateNamesArr = Array<string>
+export type PlayerPair = Array<IPlayerItem>
+export type TeammateNamesMap = Record<string, Array<string>>
 
-export interface IPlayersListStr {
-    playersListStr: string,
+export interface IPlayerNamesListStr {
+    playerNamesListStr: string,
 }
 
 export interface ICreateSingleMatchInput {
     playersListArr: Array<IPlayerItem>,
-    teammateMap?: Record<string, any>,
+    teammateNamesMap?: TeammateNamesMap,
+    filterRules?: Record<string, any>,
 }
 
 export interface ICreateMultipleMatchesInput {
     playersListArr: Array<IPlayerItem>,
     round: number,
-    teammateMap?: Record<string, any>,
+    teammateNamesMap?: TeammateNamesMap,
     options?: Record<string, any>,
 }
 
-export interface IGetRandomTeamInput {
+export interface IGetRandomPlayerPairInput {
     playersListArr: Array<IPlayerItem>,
-    savedTeamList?: Array<Team>,
-    teammateMap?: Record<string, any>,
+    playerPairsList?: Array<PlayerPair>,
+    teammateNamesMap?: TeammateNamesMap,
     filterRules?: Record<string, any>,
 }
 
 export interface IExcludedNameListInput {
     randomPlayerName: string,
-    savedTeamList?: Array<Team>,
-    teammateMap?: Record<string, any>,
+    playerPairsList?: Array<PlayerPair>,
+    teammateNamesMap?: TeammateNamesMap,
 }
 
-export interface IArrayToHtmlInput {
-    teamList: Array<Team>,
+export interface IPlayerPairsArrayToHtmlInput {
+    playerPairsList?: Array<PlayerPair>,
 }
 
-export interface ITeammateMapInput {
-    teamList: Array<Team>,
-    teammateMap?: Record<string, any>,
+export interface ITeammateNamesMapInput {
+    playerPairsList?: Array<PlayerPair>,
+    teammateNamesMap?: TeammateNamesMap,
 }
 
 export interface IFilterOptionsProps {

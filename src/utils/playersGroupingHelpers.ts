@@ -1,12 +1,13 @@
 import { 
-    Team, 
+    TeammateNamesArr,
+    PlayerPair, 
     IPlayerItem, 
-    IPlayersListStr,
+    IPlayerNamesListStr,
     ICreateSingleMatchInput,
     ICreateMultipleMatchesInput,
-    IGetRandomTeamInput,
-    IArrayToHtmlInput,
-    ITeammateMapInput,
+    IGetRandomPlayerPairInput,
+    IPlayerPairsArrayToHtmlInput,
+    ITeammateNamesMapInput,
     IExcludedNameListInput,
 } from '../interfaces/IPlayers'
 import { isNonemptyObj } from './objectHelpers'
@@ -28,41 +29,41 @@ function getRandomItem(arr: Array<any>) {
     return randomItem
 }
 
-function teamListArrToHtmlText({teamList}: IArrayToHtmlInput): string{
-    return teamList.map((team, index) => team.length > 1 ?
-                            `${index + 1}. ${team.join(' + ')} \n` :
-                            `${index + 1}. ${team.pop()} \n`
+function playerPairsListArrToHtmlText({playerPairsList=[]}: IPlayerPairsArrayToHtmlInput): string{
+    return playerPairsList.map((playerPair, index) => playerPair.length > 1 ?
+                            `${index + 1}. ${playerPair.join(' + ')} \n` :
+                            `${index + 1}. ${playerPair.pop()} \n`
                             ).join('')
 }
 
-function createPlayersListArray({playersListStr}: IPlayersListStr) {
-    return playersListStr.split(/\d+\./).slice(1).map( (player, index) => ({id: index.toString(), name: player.trim()}))
+function createPlayersListArray({playerNamesListStr}: IPlayerNamesListStr) {
+    return playerNamesListStr.split(/\d+\./).slice(1).map( (player, index) => ({id: index.toString(), name: player.trim()}))
 }
 
-function getExcludedNameList({randomPlayerName, savedTeamList=[], teammateMap={}}: IExcludedNameListInput) {
-    let excludedNameList: Array<string> = [randomPlayerName]
+function getExcludedNameList({randomPlayerName, playerPairsList=[], teammateNamesMap={}}: IExcludedNameListInput) {
+    let excludedNamesList: Array<string> = [randomPlayerName]
 
-    if (isNonemptyObj(teammateMap)) {
-        const teammate = teammateMap?.[randomPlayerName]
-        if (teammate) {
-            excludedNameList.push(...teammate)
+    if (isNonemptyObj(teammateNamesMap)) {
+        const teammateNames = teammateNamesMap?.[randomPlayerName]
+        if (teammateNames) {
+            excludedNamesList.push(...teammateNames)
         }
     }
 
-    if (savedTeamList.length > 0) {
-        excludedNameList.push(...savedTeamList.flat())
+    if (playerPairsList.length > 0) {
+        excludedNamesList.push(...playerPairsList.flat().map(({name}) => name))
     }
 
-    return excludedNameList;
+    return excludedNamesList;
 }
-function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}, filterRules={}}: IGetRandomTeamInput) {
-    if (playersListArr.length < 2) return playersListArr.map(({name}) => name)
-    let team: Array<string> = []
+function getRandomPlayerPair({playersListArr, playerPairsList=[], teammateNamesMap={}, filterRules={}}: IGetRandomPlayerPairInput) {
+    if (playersListArr.length < 2) return playersListArr
+    let playerPair: PlayerPair = []
     const randomPlayer = getRandomItem(playersListArr)
     const randomPlayerName = randomPlayer.name
-    team.push(randomPlayerName)
+    playerPair.push(randomPlayer)
 
-    const excludedNameList = getExcludedNameList({randomPlayerName, savedTeamList, teammateMap})
+    const excludedNameList = getExcludedNameList({randomPlayerName, playerPairsList, teammateNamesMap})
 
     let validTeammatesArr = playersListArr.filter(({name}) => ![...new Set(excludedNameList)].includes(name))
 
@@ -96,51 +97,53 @@ function getRandomTeam({playersListArr, savedTeamList=[], teammateMap={}, filter
 
     if (validTeammatesArr.length > 0) {
         const randomTeammate = getRandomItem(validTeammatesArr)
-        team.push(randomTeammate.name)
+        playerPair.push(randomTeammate)
     }
 
-    return team
+    return playerPair
 }
 
-function createSimpleMatch({playersListArr, teammateMap={}}: ICreateSingleMatchInput) {
-    let teamList: any = []
+function createSimpleMatch({playersListArr, teammateNamesMap={}}: ICreateSingleMatchInput) {
+    let playerPairsList: Array<Array<IPlayerItem>> = []
     let players = JSON.parse(JSON.stringify(playersListArr))
     while (players.length > 0) {
-        const team = getRandomTeam({playersListArr: players, savedTeamList: teamList, teammateMap})
-        teamList.push(team)
-        players = players.filter((player: IPlayerItem) => !teamList.flat().includes(player.name))
+        const playerPair = getRandomPlayerPair({playersListArr: players, playerPairsList, teammateNamesMap})
+        playerPairsList.push(playerPair)
+        players = players.filter((player: IPlayerItem) => !playerPairsList.flat().map(player => player.name).includes(player.name))
     }
 
-    return teamList
+    return playerPairsList
 }
 
 
-function updateTeammateMap({teamList, teammateMap={}}: ITeammateMapInput) {
-    if (teamList.length === 0) return {};
+function updateTeammateNamesMap({playerPairsList=[], teammateNamesMap={}}: ITeammateNamesMapInput) {
+    if (playerPairsList.length === 0) return {};
 
-    for (const [name1, name2] of teamList) {
+    for (const [player1, player2] of playerPairsList) {
+        const name1 = player1.name
+        const name2 = player2?.name
         if(name2) {
-            if (!teammateMap?.[name1]) {
-                teammateMap[name1] = []
+            if (!teammateNamesMap?.[name1]) {
+                teammateNamesMap[name1] = []
             }
-            teammateMap[name1].push(name2)
+            teammateNamesMap[name1].push(name2)
 
-            if (!teammateMap?.[name2]) {
-                teammateMap[name2] = []
+            if (!teammateNamesMap?.[name2]) {
+                teammateNamesMap[name2] = []
             }
-            teammateMap[name2].push(name1)
+            teammateNamesMap[name2].push(name1)
         }
     }
 
-    return teammateMap;
+    return teammateNamesMap
 }
 function createSimpleMultipleMatches({playersListArr, round, options}: ICreateMultipleMatchesInput) {
     let matchList: any = []
-    let teammateMap = {}
+    let teammateNamesMap = {}
     while (round > 0) {
-        const teamList = createSimpleMatch({playersListArr, teammateMap})
-        teammateMap = updateTeammateMap({teamList, teammateMap})
-        matchList.push(teamList)
+        const playerPairsList = createSimpleMatch({playersListArr, teammateNamesMap})
+        teammateNamesMap = updateTeammateNamesMap({playerPairsList, teammateNamesMap})
+        matchList.push(playerPairsList)
         round--
     }
     
@@ -148,9 +151,18 @@ function createSimpleMultipleMatches({playersListArr, round, options}: ICreateMu
 }
 
 
-function createAdvancedSingleMatch({playersListArr, teammateMap}: ICreateSingleMatchInput) {
-    
+function createSingleMatch({playersListArr, teammateNamesMap={}, filterRules={}}: ICreateSingleMatchInput) {
+    let playerPairsList: Array<Array<IPlayerItem>> = []
+    let players = JSON.parse(JSON.stringify(playersListArr))
+    while (players.length > 0) {
+        const playerPair = getRandomPlayerPair({playersListArr: players, playerPairsList, teammateNamesMap, filterRules})
+        playerPairsList.push(playerPair)
+        players = players.filter((player: IPlayerItem) => !playerPairsList.flat().map(player => player.name).includes(player.name))
+    }
+
+    return playerPairsList
 }
+
 
 function createAdvancedMultipleMatches({playersListArr, round, options}: ICreateMultipleMatchesInput) {
 
@@ -158,12 +170,12 @@ function createAdvancedMultipleMatches({playersListArr, round, options}: ICreate
 
 
 export {
-    getRandomTeam,
-    updateTeammateMap,
+    getRandomPlayerPair,
+    updateTeammateNamesMap,
     createSimpleMatch,
     createSimpleMultipleMatches,
-    createAdvancedSingleMatch,
+    createSingleMatch,
     createAdvancedMultipleMatches,
     createPlayersListArray,
-    teamListArrToHtmlText,
+    playerPairsListArrToHtmlText,
 }
