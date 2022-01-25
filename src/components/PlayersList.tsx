@@ -2,7 +2,6 @@ import { useState, ChangeEvent } from 'react'
 import {IPlayersListProps} from '../interfaces/IPlayers'
 import FilterOptions from './FilterOptions'
 import FilterRules from './FilterRules'
-import './PlayersList.css'
 
 const genderCodeMap: Record<string, any> = {m: '&#9794;', f: '&#9792;'}
 function PlayersList({dataList, matchType, onChangeGender}: IPlayersListProps) {
@@ -14,17 +13,17 @@ function PlayersList({dataList, matchType, onChangeGender}: IPlayersListProps) {
         onChangeGender(newList)
     }
     return (
-        <div className="PlayersList" mt-10px>
+        <div className="w-90vw mt-15px bg-orange-100 mx-auto py-5px pl-5px">
             {
                 dataList.map((player) => {
                     const {id, name, gender} = player
                     return (
-                    <div key={id} className='player'>
-                        <span className='player-name'>{name}</span>
-                        {gender && <span>{gender}</span>}
+                    <div key={id} className='mb-5px'>
+                        <span className='w-120px inline-block'>{name}</span>
+                        {gender && <span className='w-30px inline-block'>{gender}</span>}
                         {isAdvancedMatch &&
                             <>
-                                <select name={`gender-${id}`} onChange={handleGenderChange}>
+                                <select className='w-100px' name={`gender-${id}`} onChange={handleGenderChange}>
                                     <option value="">gender</option>
                                     <option value="m">male</option>
                                     <option value="f">female</option>

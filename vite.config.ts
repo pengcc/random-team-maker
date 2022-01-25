@@ -8,8 +8,12 @@ export default defineConfig({
   plugins: [
     react(),
     Unocss({
-      rules: [
-        [/^fs-[(calc.*)]$/, ([, c]) => ({'font-size': `${c}`})]],
-    })
+      shortcuts: [
+        // you could still have object style
+        {
+          'btn': 'py-2 px-4 font-semibold rounded-lg',
+        },
+      ],
+      }),
   ],
 })

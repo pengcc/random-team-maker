@@ -10,17 +10,17 @@ function FilterRules({onChangeRule}: IFilterRulesProps) {
 
     return (
         <div>
-            <div onChange={handleGenderRuleChange}>
-                gender rule 
+            <div onChange={handleGenderRuleChange} className="mt-10px w-90vw mx-auto bg-indigo-300 py-5px px-3px">
+                <label className="mr-10px font-semibold">Gender rules: </label>
                 {
                     genderRules.map(rule => (
-                        <label key={rule}>
+                        <label key={rule} className="mr-6px">
+                            <input className="mr-3px" name="gender-rule" defaultValue={rule} type='radio' />
                             {rule}
-                            <input name="gender-rule" defaultValue={rule} type='radio' />
                         </label>
                     ))
                 }
-                <button>reset</button>
+                {/* <button className="w-120px py-2 px-2 bg-red-200 border-none font-semibold rounded-lg mr-15px">reset</button> */}
             </div>
             {/* <div>
                 score filter
