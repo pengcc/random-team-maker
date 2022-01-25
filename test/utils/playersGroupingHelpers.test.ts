@@ -2,10 +2,9 @@ import {test, describe, expect, assert} from 'vitest'
 import { IPlayerItem } from '../../src/interfaces/IPlayers'
 import {
     getRandomPlayerPair, 
-    createSimpleMatch, 
-    createSimpleMultipleMatches, 
     updateTeammateNamesMap,
-    createSingleMatch
+    createSingleMatch,
+    createMultipleMatches
 } from '../../src/utils/playersGroupingHelpers'
 
 describe('players grouping helpers', () => {
@@ -33,20 +32,20 @@ describe('players grouping helpers', () => {
     describe('helpers -- createSimpleMatch', () => {
         test('odd players should be a single team', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}]
-            const playerPairsList = createSimpleMatch({playersListArr: players})
+            const playerPairsList = createSingleMatch({playersListArr: players})
             expect(playerPairsList.length).toBe(2)
         })
     
         test('even players should be fully grouped', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}, {name: 'yo yo'}]
-            const playerPairsList = createSimpleMatch({playersListArr: players})
+            const playerPairsList = createSingleMatch({playersListArr: players})
             expect(playerPairsList.flat().map(({name}) => name)).toEqual(expect.arrayContaining(players.map(({name}) => name)))
         })
 
         test('given teammate names map, teammates should not rematch together', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}, {name: 'yo yo'}, {name: 'hi hi'}, {name: 'la la'}]
-            const teammateNamesMap = {foo: ['bar', 'zzz', 'la la']}
-            const playerPairsList = createSimpleMatch({playersListArr: players, teammateNamesMap})
+            const teammateNamesMap = {foo: ['bar', 'zzz', 'la la'], bar: ['foo'], zzz: ['foo'], 'la la': ['foo']}
+            const playerPairsList = createSingleMatch({playersListArr: players, teammateNamesMap})
             const playerPairOfFoo = playerPairsList.find( playerPair => playerPair.some(({name}) => name === 'foo'))
             if (playerPairOfFoo && playerPairOfFoo.length > 1) {
                 const playerFooMate = playerPairOfFoo.find(({name}) => name !== 'foo')
@@ -75,7 +74,7 @@ describe('players grouping helpers', () => {
     describe('create simple multiple matches', () => {
         test('given odd players, the match should be different', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}, {name: 'yo yo'}, {name: 'hi hi'}]
-            const matchList = createSimpleMultipleMatches({playersListArr: players, round: 2})
+            const matchList = createMultipleMatches({playersListArr: players, round: 2})
             const match1 = matchList[0]
             const match2 = matchList[1]
             const fooTeam1 = match1.find((playerPair: Array<IPlayerItem>) => playerPair.some(({name}) => name === 'foo'))
@@ -89,7 +88,7 @@ describe('players grouping helpers', () => {
 
         test('given even players, the match should be different', () => {
             const players = [{name: 'foo'}, {name: 'bar'}, {name: 'zzz'}, {name: 'yo yo'}, {name: 'hi hi'}, {name: 'ja ja'}]
-            const matchList = createSimpleMultipleMatches({playersListArr: players, round: 2})
+            const matchList = createMultipleMatches({playersListArr: players, round: 2})
             const match1 = matchList[0]
             const match2 = matchList[1]
             const fooTeam1 = match1.find((playerPair: Array<IPlayerItem>) => playerPair.some(({name}) => name === 'foo'))
@@ -107,8 +106,32 @@ describe('players grouping helpers', () => {
             const players = [{name: 'foo', gender: 'f'}, {name: 'bar', gender: 'm'}, {name: 'zzz', gender: 'm'}, {name: 'yo yo', gender: 'f'}, {name: 'hi hi', gender: 'm'}]
             const filterRules = {gender: 'no male double'}
             const playerPairsList = createSingleMatch({playersListArr: players, filterRules})
-            const maleDoubleTeam = playerPairsList.filter(pair => pair?.[0]?.gender === 'm' && pair?.[1]?.gender === 'm')
+            const maleDoubleTeam = playerPairsList.filter(pair => pair.length === 2).filter(pair => pair?.[0]?.gender === 'm' && pair?.[1]?.gender === 'm')
             expect(maleDoubleTeam).toHaveLength(0)
+        })
+
+        test('no female double team', () => {
+            const players = [{name: 'foo', gender: 'f'}, {name: 'bar', gender: 'm'}, {name: 'zzz', gender: 'm'}, {name: 'yo yo', gender: 'f'}, {name: 'hi hi', gender: 'm'}]
+            const filterRules = {gender: 'no female double'}
+            const playerPairsList = createSingleMatch({playersListArr: players, filterRules})
+            const femaleDoubleTeam = playerPairsList.filter(pair => pair.length === 2).filter(pair => pair?.[0]?.gender === 'f' && pair?.[1]?.gender === 'f')
+            expect(femaleDoubleTeam).toHaveLength(0)
+        })
+
+        test('no mix team', () => {
+            const players = [{name: 'foo', gender: 'f'}, {name: 'bar', gender: 'm'}, {name: 'zzz', gender: 'm'}, {name: 'yo yo', gender: 'f'}, {name: 'hi hi', gender: 'm'}]
+            const filterRules = {gender: 'no mix'}
+            const playerPairsList = createSingleMatch({playersListArr: players, filterRules})
+            const mixTeam = playerPairsList.filter(pair => pair.length === 2).filter(pair => pair?.[0]?.gender !== pair?.[1]?.gender)
+            expect(mixTeam).toHaveLength(0)
+        })
+
+        test('only mix', () => {
+            const players = [{name: 'foo', gender: 'f'}, {name: 'bar', gender: 'm'}, {name: 'zzz', gender: 'm'}, {name: 'yo yo', gender: 'f'}, {name: 'hi hi', gender: 'm'}]
+            const filterRules = {gender: 'only mix'}
+            const playerPairsList = createSingleMatch({playersListArr: players, filterRules})
+            const sameGenderTeam = playerPairsList.filter(pair => pair.length === 2).filter(pair => pair?.[0]?.gender === pair?.[1]?.gender)
+            expect(sameGenderTeam).toHaveLength(0)
         })
     })
 })

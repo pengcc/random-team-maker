@@ -7,11 +7,13 @@ export interface IPlayerItem {
 export interface IPlayersListProps {
     dataList: Array<IPlayerItem>,
     matchType: string,
+    onChangeGender: Function,
 }
 
 export type TeammateNamesArr = Array<string>
 export type PlayerPair = Array<IPlayerItem>
 export type TeammateNamesMap = Record<string, Array<string>>
+export type PlayerPairsList = Array<PlayerPair>
 
 export interface IPlayerNamesListStr {
     playerNamesListStr: string,
@@ -27,32 +29,36 @@ export interface ICreateMultipleMatchesInput {
     playersListArr: Array<IPlayerItem>,
     round: number,
     teammateNamesMap?: TeammateNamesMap,
-    options?: Record<string, any>,
+    filterRules?: Record<string, any>,
 }
 
 export interface IGetRandomPlayerPairInput {
     playersListArr: Array<IPlayerItem>,
-    playerPairsList?: Array<PlayerPair>,
+    playerPairsList?: PlayerPairsList,
     teammateNamesMap?: TeammateNamesMap,
     filterRules?: Record<string, any>,
 }
 
 export interface IExcludedNameListInput {
     randomPlayerName: string,
-    playerPairsList?: Array<PlayerPair>,
+    playerPairsList?: PlayerPairsList,
     teammateNamesMap?: TeammateNamesMap,
 }
 
 export interface IPlayerPairsArrayToHtmlInput {
-    playerPairsList?: Array<PlayerPair>,
+    playerPairsList?: PlayerPairsList,
 }
 
 export interface ITeammateNamesMapInput {
-    playerPairsList?: Array<PlayerPair>,
+    playerPairsList?: PlayerPairsList,
     teammateNamesMap?: TeammateNamesMap,
 }
 
 export interface IFilterOptionsProps {
     playerId: string,
-    onChange: Function,
+    onChangeFilterOption: Function,
+}
+
+export interface IFilterRulesProps {
+    onChangeRule: Function,
 }

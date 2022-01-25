@@ -1,13 +1,21 @@
-function FilterRules() {
+import { ChangeEvent } from "react"
+import { IFilterRulesProps } from "../interfaces/IPlayers"
+
+function FilterRules({onChangeRule}: IFilterRulesProps) {
     const genderRules = ['no male double', 'no female double', 'no mix', 'only mix']
+    
+    function handleGenderRuleChange(e: ChangeEvent<HTMLInputElement>) {
+        onChangeRule({gender: e.target.value})
+    }
+
     return (
         <div>
-            <div>
+            <div onChange={handleGenderRuleChange}>
                 gender rule 
                 {
                     genderRules.map(rule => (
                         <label key={rule}>
-                            rule
+                            {rule}
                             <input name="gender-rule" defaultValue={rule} type='radio' />
                         </label>
                     ))

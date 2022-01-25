@@ -1,87 +1,95 @@
-import { useState } from 'react'
-import {useFormInput} from './utils/myHooks'
+import { useState, ChangeEvent, useRef, useEffect } from 'react'
 import PlayersList from './components/PlayersList'
-import { IPlayerItem, Team } from './interfaces/IPlayers'
+import { IPlayerItem, PlayerPair } from './interfaces/IPlayers'
 import {
-    createSimpleMatch,
-    createSimpleMultipleMatches,
-    createAdvancedSingleMatch,
-    createAdvancedMultipleMatches,
+    createSingleMatch,
     createPlayersListArray,
-    getRandomTeam,
-    teamListArrToHtmlText,
+    getRandomPlayerPair,
+    playerPairsListArrToHtmlText,
+    getMaxRoundCount,
+    createMultipleMatches,
 } from './utils/playersGroupingHelpers'
-import logo from './assets/logo.svg'
-import './App.css'
+import FilterRules from './components/FilterRules'
 
 function App() {
-  const playersListStr = useFormInput('')
-  const round = useFormInput(0)
-  const [matchType, setMatchType] = useState('simple')
-  const [simpleSingleMatch, setSimpleSingleMatch] = useState([])
-  const [simpleMultipleMatches, setSimpleMultipleMatches] = useState([])
+  const playersTextRef = useRef<HTMLTextAreaElement>(null)
+  const [playersListStr, setPlayersListStr] = useState('')
+  const [round, setRound] = useState(1) 
+  const [matchType, setMatchType] = useState('basic')
   const [playersListArr, setPlayersListArr] = useState<Array<IPlayerItem>>([])
-  const [simpleSingleMatchText, setSimpleSingleMatchText] = useState('')
-  const [simpleMultipleMatchText, setSimpleMultipleMatchText] = useState('')
+  const [singleMatchText, setSingleMatchText] = useState('')
+  const [multipleMatchText, setMultipleMatchText] = useState('')
+  const [filterRules, setFilterRules] = useState({})
 
-  function handleCreatingSimpleMatch() {
-    const playersStr = playersListStr.value;
-    if (matchType !== 'simple') {
-      setMatchType('simple')
+  useEffect(() => {
+    if (playersTextRef.current) {
+      playersTextRef.current.style.height = "0px"
+      const scrollHeight = playersTextRef.current.scrollHeight
+      playersTextRef.current.style.height = `${scrollHeight}px`
     }
-    if (playersStr.length > 0) {
-      const playersArr = createPlayersListArray({playersListStr: playersStr});
-      setPlayersListArr(playersArr);
+  }, [playersListStr])
+
+  function handleMatchTypeSwitching(e: ChangeEvent<HTMLInputElement>) {
+    setMatchType(e.target.value)
+    const playerNamesListStr = playersListStr
+    if (playerNamesListStr) {
+      const playersArr = createPlayersListArray({playerNamesListStr})
+      setPlayersListArr(playersArr)
     }
   }
 
-  function handleCreatingAdvancedMatch() {
-    setMatchType('advanced')
-  }
-  
-  function handleShowingSimpleSingleMatch() {
-    const simpleMatch = createSimpleMatch({playersListArr})
-    const matchResultText = teamListArrToHtmlText({teamList: simpleMatch})
-    setSimpleSingleMatchText(matchResultText);
+  function onCreatingSingleMatch() {
+    const playerPairsList = createSingleMatch({playersListArr, filterRules})
+    const matchResultText = playerPairsListArrToHtmlText({playerPairsList})
+    setSingleMatchText(matchResultText);
   }
 
-  function handleShowingSimpleMultipleMatches() {
-    const multipleMatches = createSimpleMultipleMatches({playersListArr, round: round.value})
-    const matchResultText = multipleMatches.map((teamList: Array<Team>) => teamListArrToHtmlText({teamList})).join('\n \n')
-    setSimpleMultipleMatchText(matchResultText)
+  function onCreatingMultipleMatches() {
+    const multipleMatches = createMultipleMatches({playersListArr, round, filterRules})
+    const matchResultText = multipleMatches.map((playerPairsList: Array<PlayerPair>) => playerPairsListArrToHtmlText({playerPairsList})).join('\n \n')
+    setMultipleMatchText(matchResultText)
   }
   return (
     <div className="App">
-      <header className="App-header">
+      <header className="flex flex-col justify-center items-center text-white min-h-6vh bg-gray-700 text-size-[calc(10px_+_2vmin)]">
         Random team
       </header>
-      <main>
-          <div className="players-list">
-            <label>Input players list</label>
-            <input id="playersListStr" className="playersList-input" {...playersListStr} />
+      <main className='mt-15px'>
+          <div>
+            <label className='inline-block h-30px lh-30ox font-bold'>Add players</label>
+            <textarea ref={playersTextRef} id="playersListStr" name="playersText" className="playersList-input" value={playersListStr} onChange={(e) => setPlayersListStr(e.target.value)}></textarea>
           </div>
-          <button onClick={handleCreatingSimpleMatch}>Create simple match</button>
-          <button onClick={handleCreatingAdvancedMatch}>Create advanced match</button>
-          {playersListArr.length > 0 && <PlayersList dataList={playersListArr} matchType={matchType}/>}
+          <div className="match-types" onChange={handleMatchTypeSwitching}>
+            <label>Basic match<input name="matchType" defaultValue="basic" type="radio" /></label>
+            <label>Advanced match<input name="matchType" defaultValue="advanced" type="radio" /></label>
+          </div>
           
-          {playersListArr.length > 0 && 
+          {playersListArr.length > 0 &&
+              <>
+                <PlayersList dataList={playersListArr} matchType={matchType} onChangeGender={(players: Array<IPlayerItem>) => setPlayersListArr(players)}/>
+                {matchType === 'advanced' && <FilterRules onChangeRule={(rule: Record<string, any>) => {setFilterRules(rule)}} />}
+                <div className='action-fields'>
+                  <div className='action-option'>
+                    <button id="creatingSingleMatch" onClick={onCreatingSingleMatch} className="action-btn">Single match</button>
+                  </div>
+                  <div className='action-option'>
+                    <button id="creatingMultipleMatches" onClick={onCreatingMultipleMatches} className="action-btn">Multiple matches</button>
+                    <label className='round'>
+                      Round: <input name="round-value" placeholder={`1 - ${getMaxRoundCount(playersListArr.length)}`} value={round} onChange={(e) => setRound(Number(e.target.value))} type="number" min="1" max={getMaxRoundCount(playersListArr.length)} />
+                    </label>
+                  </div>
+                </div>
+              </>
+          }
+          {singleMatchText && 
               <div>
-                <button id="showSingleMatch" onClick={handleShowingSimpleSingleMatch} className="action-btn">Simple Single match</button>
-                <button id="showMultipleMatches" onClick={handleShowingSimpleMultipleMatches} className="action-btn">Simple Multiple matches</button>
-                <label>input round number</label>
-                <input {...round} />
+                <textarea value={singleMatchText}></textarea>
               </div>
           }
-          {simpleSingleMatchText && 
-            <>
+          {multipleMatchText &&
               <div>
-                <textarea defaultValue={simpleSingleMatchText}></textarea>
+                <textarea value={multipleMatchText}></textarea>
               </div>
-              
-              <div>
-                <textarea defaultValue={simpleMultipleMatchText}></textarea>
-              </div>
-            </>
           }
           
       </main>
