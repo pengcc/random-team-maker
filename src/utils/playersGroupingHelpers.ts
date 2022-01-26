@@ -37,7 +37,14 @@ function playerPairsListArrToHtmlText({playerPairsList=[]}: IPlayerPairsArrayToH
 }
 
 function createPlayersListArray({playerNamesListStr}: IPlayerNamesListStr) {
-    return playerNamesListStr.split(/\d+\./).slice(1).map( (player, index) => ({id: index.toString(), name: player.trim()}))
+    const nameInNewLineRegex = /(?:^[a-zA-Z]+\s?(\n?))+/g
+    let namesArr
+    if (nameInNewLineRegex.test(playerNamesListStr)) {
+        namesArr = playerNamesListStr.split('\n')
+    } else {
+        namesArr = playerNamesListStr.split(/\d+\./).slice(1)
+    }
+    return namesArr.map( (player, index) => ({id: index.toString(), name: player.trim()}))
 }
 
 function getExcludedNameList({randomPlayerName, playerPairsList=[], teammateNamesMap={}}: IExcludedNameListInput) {

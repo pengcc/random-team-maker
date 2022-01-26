@@ -83,7 +83,7 @@ function App() {
                   <div className='mt-10px flex items-center justify-center'>
                     <button id="creatingMultipleMatches" onClick={onCreatingMultipleMatches} className="w-150px py-2 px-2 bg-blue-300 border-none font-semibold rounded-lg mr-15px">Multiple matches</button>
                     <label>
-                      Round: <input className='w-60px' name="round-value" placeholder={`1 - ${getMaxRoundCount(playersListArr.length)}`} value={round} onChange={(e) => setRound(Number(e.target.value))} type="number" min="1" max={getMaxRoundCount(playersListArr.length)} />
+                      Round: <input className='w-60px' name="round-value" placeholder={`1 - ${getMaxRoundCount(playersListArr.length)}`} value={round} onChange={(e) => setRound(Number(e.target.value))} type="text" />
                     </label>
                   </div>
                 </div>
