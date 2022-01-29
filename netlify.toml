@@ -1,7 +1,6 @@
 [build.environment]
   NPM_FLAGS = "--version"
   NODE_VERSION = "16"
-  NODE_ENV = "production"
 
 [[redirects]]
   from = "/*"
